@@ -2,207 +2,55 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Morpion</title>
+    <title>Points de la classe</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background: url('fond.jpg') no-repeat center center fixed;
-            background-size: cover;
+            font-family: Arial;
+            background: #f2f2f2;
             display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
+            flex-wrap: wrap;
+            gap: 20px;
+            padding: 20px;
         }
-        .menu, .game-container {
-            background: rgba(0, 0, 0, 0.7);
-            padding: 40px;
-            border-radius: 15px;
-            text-align: center;
-            color: white;
-            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(10px);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        button {
-            background: linear-gradient(45deg, #ff9800, #ff5722);
-            border: none;
-            padding: 15px 25px;
-            color: white;
-            font-size: 1.2em;
+
+        .eleve {
+            background: white;
+            width: 150px;
+            padding: 15px;
             border-radius: 10px;
-            margin: 10px;
-            cursor: pointer;
-            transition: 0.3s;
+            text-align: center;
+            box-shadow: 0 0 5px rgba(0,0,0,0.2);
         }
-        button:hover {
-            background: linear-gradient(45deg, #ff5722, #ff9800);
-            transform: scale(1.05);
-        }
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(3, 120px);
-            grid-gap: 10px;
-            justify-content: center;
-            margin-top: 20px;
-        }
-        .cell {
-            width: 120px;
-            height: 120px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2.5em;
-            background-color: rgba(255, 255, 255, 0.9);
-            border: 3px solid #444;
-            cursor: pointer;
-            transition: background 0.3s;
-            border-radius: 15px;
-            color: black; /* Change la couleur des X et O en noir */
-            font-weight: bold;
-        }
-        .cell.winning {
-            animation: winAnimation 1s infinite alternate;
-        }
-        @keyframes winAnimation {
-            0% { background-color: #4caf50; color: white; }
-            100% { background-color: #81c784; color: white; }
-        }
-        .hidden {
-            display: none;
+
+        button {
+            margin: 5px;
+            font-size: 18px;
+            width: 40px;
         }
     </style>
 </head>
 <body>
-    <div id="menu" class="menu">
-        <h1>Jeu du Morpion</h1>
-        <button onclick="startGame('player')">Jouer avec un ami</button>
-        <button onclick="startGame('easy')"> Mode Facile (IA)</button>
-        <button onclick="startGame('medium')">Mode Moyen (IA)</button>
-        <button onclick="startGame('hard')">Mode Difficile (IA)</button>
-        <button onclick="startGame('extreme')">Mode Extrême (IA)</button>
-    </div>
-    <div id="game-container" class="game-container hidden">
-        <h1 id="game-mode">Jeu en cours</h1>
-        <p id="status">Tour du joueur X</p>
-        <div id="board" class="grid"></div>
-        <button onclick="resetGame()">Nouvelle partie</button>
-        <button onclick="goBackToMenu()">Retour</button>
-    </div>
-    <script>
-        let board, currentPlayer, gameActive, mode;
-        const winningCombos = [
-            [0, 1, 2], [3, 4, 5], [6, 7, 8],
-            [0, 3, 6], [1, 4, 7], [2, 5, 8],
-            [0, 4, 8], [2, 4, 6]
-        ];
 
-        function resetGame() {
-            board = Array(9).fill('');
-            currentPlayer = 'X';
-            gameActive = true;
-            document.getElementById('status').textContent = "Tour du joueur X";
-            createBoard();
-        }
+<div class="eleve">
+    <h3>Lucas</h3>
+    <p>Points : <span id="p1">0</span></p>
+    <button onclick="change('p1', 1)">+</button>
+    <button onclick="change('p1', -1)">-</button>
+</div>
 
-        function checkWinner(player) {
-            return winningCombos.find(combo =>
-                combo.every(index => board[index] === player)
-            );
-        }
+<div class="eleve">
+    <h3>Emma</h3>
+    <p>Points : <span id="p2">0</span></p>
+    <button onclick="change('p2', 1)">+</button>
+    <button onclick="change('p2', -1)">-</button>
+</div>
 
-        function startGame(selectedMode) {
-            mode = selectedMode;
-            document.getElementById('menu').classList.add('hidden');
-            document.getElementById('game-container').classList.remove('hidden');
-            document.getElementById('game-mode').textContent = `Mode : ${mode}`;
-            resetGame();
-        }
+<script>
+function change(id, valeur) {
+    let span = document.getElementById(id);
+    span.textContent = parseInt(span.textContent) + valeur;
+}
+</script>
 
-        function goBackToMenu() {
-            document.getElementById('game-container').classList.add('hidden');
-            document.getElementById('menu').classList.remove('hidden');
-        }
-
-        function createBoard() {
-            const boardElement = document.getElementById('board');
-            boardElement.innerHTML = '';
-            board.forEach((cell, index) => {
-                const cellElement = document.createElement('div');
-                cellElement.classList.add('cell');
-                cellElement.textContent = cell;
-                cellElement.onclick = () => makeMove(index);
-                boardElement.appendChild(cellElement);
-            });
-        }
-
-        function makeMove(index) {
-            if (!gameActive || board[index] !== '' || (mode !== 'player' && currentPlayer === 'O')) return;
-            board[index] = currentPlayer;
-            updateGame();
-        }
-
-        function updateGame() {
-            createBoard();
-            const winCombo = checkWinner(currentPlayer);
-            if (winCombo) {
-                document.getElementById('status').textContent = `🎉 Le joueur ${currentPlayer} a gagné ! 🎉`;
-                winCombo.forEach(i => document.querySelectorAll('.cell')[i].classList.add('winning'));
-                gameActive = false;
-                return;
-            }
-            if (!board.includes('')) {
-                document.getElementById('status').textContent = "Match nul !";
-                gameActive = false;
-                return;
-            }
-            currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
-            document.getElementById('status').textContent = `Tour du joueur ${currentPlayer}`;
-            if (gameActive && currentPlayer === 'O' && mode !== 'player') {
-                setTimeout(aiMove, 500);
-            }
-        }
-
-        function aiMove() {
-            let move;
-            let emptyCells = board.map((v, i) => v === '' ? i : null).filter(v => v !== null);
-            if (emptyCells.length === 0) return;
-
-            if (mode === 'easy') {
-                move = emptyCells[Math.floor(Math.random() * emptyCells.length)];
-            } else if (mode === 'medium') {
-                move = minimax(board, 'O', false, 2).index;
-            } else if (mode === 'hard') {
-                move = minimax(board, 'O', false, 4).index;
-            } else {
-                move = minimax(board, 'O', true).index;
-            }
-            if (move !== undefined) {
-                board[move] = 'O';
-                updateGame();
-            }
-        }
-
-        function minimax(newBoard, player, alphaBeta = false, depth = Infinity, alpha = -Infinity, beta = Infinity) {
-            let empty = newBoard.map((v, i) => v === '' ? i : null).filter(v => v !== null);
-            if (checkWinner('X')) return { score: -10 };
-            if (checkWinner('O')) return { score: 10 };
-            if (!empty.length || depth === 0) return { score: 0 };
-
-            let bestMove = { score: player === 'O' ? -Infinity : Infinity };
-            for (let i of empty) {
-                newBoard[i] = player;
-                let score = minimax(newBoard, player === 'O' ? 'X' : 'O', alphaBeta, depth - 1, alpha, beta).score;
-                newBoard[i] = '';
-                if (player === 'O' ? score > bestMove.score : score < bestMove.score) {
-                    bestMove = { index: i, score };
-                }
-            }
-            return bestMove;
-        }
-    </script>
 </body>
 </html>
